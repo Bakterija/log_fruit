@@ -1,0 +1,133 @@
+#: include app_modules/widgets/globals.kv
+#: import LogViewClass app_modules.widgets.log_view.LogViewClass
+#: import RecycleDataBox app_modules.widgets.databox.recycle_databox.RecycleDataBox
+
+<LogViewClass>:
+    size_hint: 1, 1
+    font_size: logview_font_size
+    height: logview_height
+    color: col_white
+    text_size: self.size
+    halign: 'left'
+    valign: 'top'
+    padding: cm(0.2), cm(0.1)
+    markup: True
+    canvas.before:
+        Color:
+            rgb: 0.2, 0.2, 0.2, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<RootWidget>:
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 0.1, 0.1, 0.1, 1
+        Rectangle:
+            pos: 0, 0
+            size: self.size
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: 1, 0.05
+        canvas.before:
+            Color:
+                rgba: col_dgrey
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Label:
+            size_hint: None, 1
+            text: 'Filter'
+            font_size: self.height * 0.5
+            width: self.font_size * 4
+        TextInput:
+            id: filter_input
+            size_hint: 1, 1
+            background_color: col_dgrey
+            background_active: ''
+            background_normal: ''
+            background_disabled_normal: ''
+            text_color: col_white
+            border: 0, 0, 0, 0
+            cursor_color: col_bblue
+            markup: True
+            foreground_color: col_white
+            font_size: self.height * 0.5
+            multiline: False
+            on_text_validate: app.set_filter_text(self.text)
+            text: 'python'
+            canvas.before:
+                Color:
+                    rgba: col_white
+                Line:
+                    points: self.x, self.y + (self.height * 0.2), self.right - (self.width * 0.05), self.y + (self.height * 0.2)
+        Label:
+            size_hint: None, 1
+            text: 'Filter'
+            font_size: self.height * 0.5
+            width: self.font_size * 4
+            text: 'FPS: %s' % (app.fps)
+
+
+    RecycleView:
+        id: rv
+        size_hint: 1, 0.9
+        scroll_type: ['bars', 'content']
+        scroll_wheel_distance: dp(114)
+        bar_width: scrollview_bar_width
+        viewclass: 'LogViewClass'
+
+        RecycleBoxLayout:
+            orientation: 'vertical'
+            size_hint: None, None
+            width: self.parent.width - scrollview_bar_width
+            height: self.minimum_height
+            default_size_hint: 1, None
+            default_size: None, logview_height
+            spacing: int(cm(0.05))
+
+    BoxLayout:
+        size_hint: 1, 0.05
+        orientation: 'horizontal'
+        canvas.before:
+            Color:
+                rgb: col_dgrey
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            size_hint_x: 0.22
+            font_size: self.height * 0.5
+            width: self.texture_size[0], None
+            text: 'WLOG LEN: %s' % (app.log_full_len2)
+
+        Label:
+            size_hint_x: 0.21
+            font_size: self.height * 0.5
+            width: self.texture_size[0], None
+            text: app.len_log_full
+            text: 'LOG LEN: %s' % (app.log_full_len)
+
+        Label:
+            size_hint_x: 0.22
+            font_size: self.height * 0.5
+            width: self.texture_size[0], None
+            text: 'FLOG LEN: %s' % (app.log_filtered_len)
+
+        Button:
+            size_hint: 0.1, 1
+            text: 'Save'
+            on_release: app.save_logs(app.log_filtered)
+
+        Button:
+            size_hint: 0.1, 1
+            text: 'Clear'
+            on_release: app.clear_logs()
+
+        Button:
+            size_hint: 0.1, 1
+            text: 'Stop'
+            on_release: app.stop_worker()
