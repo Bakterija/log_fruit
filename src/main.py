@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 from kivy.properties import NumericProperty, ListProperty, StringProperty
 from kivy.uix.floatlayout import FloatLayout
-from app_modules.worker import Worker, wlock
+from app_modules.worker import worker, wlock
 from kivy.uix.boxlayout import BoxLayout
-from app_modules import key_binder
+from app_modules import hotkeys_global
 from kivy.utils import escape_markup
 from kivy.clock import Clock
 from time import time, sleep
 from kivy.app import App
+from other.test_manager import TestManager
+
+TESTING = True
 
 
 class RootWidget(BoxLayout):
     def focus_iput(self, *args):
         self.ids.filter_input.focus = True
         self.ids.filter_input.select_all()
+        self.ids.rv.scroll_y = 0.5
+
 
 class LogFruitApp(App):
     highlight_color = StringProperty('#00BFFF')
@@ -27,18 +32,25 @@ class LogFruitApp(App):
     log_queued = []
     fps = NumericProperty()
     fps_log = list(range(10))
+    _do_update_log = False
 
     def build(self):
-        self.worker = Worker()
+        self.worker = worker
         self.root = RootWidget()
         self.bind(log_filtered=self.update_rv_data)
-        key_binder.add(
-            'focus_iput', '108', 'down', self.root.focus_iput, modifier=['ctrl'])
-        # key_binder.log_keys = True
         Clock.schedule_interval(self.read_logs, 0.5)
         Clock.schedule_interval(self.update_fps, 0)
         Clock.schedule_once(self.worker.start, 0)
+        hotkeys_global.init_hotkeys(self)
+        self.root.ids.tab_holder.bind(
+            current_selection_text=lambda o,v: self.set_filter_text(v))
+        if TESTING:
+            self.testmanager = TestManager()
+            self.testmanager.init(self, self.root)
         return self.root
+
+    def on_log_full(self, _, value):
+        self._do_update_log = True
 
     def update_rv_data(self, _, value):
         self.root.ids.rv.data = value
@@ -71,7 +83,9 @@ class LogFruitApp(App):
     def read_logs(self, *args):
         new_log = self.worker.read_queue()
 
-        if new_log:
+        if new_log or self._do_update_log:
+            if self._do_update_log:
+                self._do_update_log = False
 
             self.log_full = list(self.log_full) + new_log
 

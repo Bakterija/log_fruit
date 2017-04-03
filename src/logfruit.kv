@@ -1,6 +1,10 @@
 #: include app_modules/widgets/globals.kv
 #: import LogViewClass app_modules.widgets.log_view.LogViewClass
+#: import LogLayout app_modules.widgets.log_view.LogLayout
+#: import SelectableRecycleBoxLayout app_modules.widgets.log_view.SelectableRecycleBoxLayout
 #: import RecycleDataBox app_modules.widgets.databox.recycle_databox.RecycleDataBox
+#: import TabHolder app_modules.widgets.filter_tabs.TabHolder
+
 
 <LogViewClass>:
     size_hint: 1, 1
@@ -14,7 +18,7 @@
     markup: True
     canvas.before:
         Color:
-            rgb: 0.2, 0.2, 0.2, 1
+            rgb: (0.2, 0.2, 0.3) if self.selected else (0.2, 0.2, 0.2)
         Rectangle:
             pos: self.pos
             size: self.size
@@ -27,6 +31,10 @@
         Rectangle:
             pos: 0, 0
             size: self.size
+
+    TabHolder:
+        id: tab_holder
+        size_hint: 1, 0.05
 
     BoxLayout:
         orientation: 'horizontal'
@@ -51,35 +59,28 @@
             background_disabled_normal: ''
             text_color: col_white
             border: 0, 0, 0, 0
-            cursor_color: col_bblue
+            cursor_color: col_white
             markup: True
             foreground_color: col_white
             font_size: self.height * 0.5
             multiline: False
             on_text_validate: app.set_filter_text(self.text)
-            text: 'python'
             canvas.before:
                 Color:
                     rgba: col_white
                 Line:
                     points: self.x, self.y + (self.height * 0.2), self.right - (self.width * 0.05), self.y + (self.height * 0.2)
-        Label:
-            size_hint: None, 1
-            text: 'Filter'
-            font_size: self.height * 0.5
-            width: self.font_size * 4
-            text: 'FPS: %s' % (app.fps)
 
 
-    RecycleView:
+    LogLayout:
         id: rv
-        size_hint: 1, 0.9
+        size_hint: 1, 0.85
         scroll_type: ['bars', 'content']
         scroll_wheel_distance: dp(114)
         bar_width: scrollview_bar_width
         viewclass: 'LogViewClass'
 
-        RecycleBoxLayout:
+        SelectableRecycleBoxLayout:
             orientation: 'vertical'
             size_hint: None, None
             width: self.parent.width - scrollview_bar_width
@@ -127,7 +128,9 @@
             text: 'Clear'
             on_release: app.clear_logs()
 
-        Button:
+        Label:
             size_hint: 0.1, 1
-            text: 'Stop'
-            on_release: app.stop_worker()
+            text: 'Filter'
+            font_size: self.height * 0.5
+            width: self.font_size * 4
+            text: 'FPS: %s' % (app.fps)

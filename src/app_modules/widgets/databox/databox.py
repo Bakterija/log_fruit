@@ -14,7 +14,7 @@ class DataView(object):
 
     def refresh_view_attrs(self, rv, index, data):
         '''Attributes are set from data dict keys and values'''
-        for k, v in data.iteritems():
+        for k, v in data.items():
             setattr(self, k, v)
 
 
@@ -56,7 +56,7 @@ class DataBox(BoxLayout):
                     if str(
                         e).find("has no attribute 'refresh_view_attrs'") != -1:
                             for i, child in enumerate(reversed(self.children)):
-                                for k, v in value[i].iteritems():
+                                for k, v in value[i].items():
                                     setattr(child, k, v)
 
 
