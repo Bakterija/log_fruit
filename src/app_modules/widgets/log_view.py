@@ -27,11 +27,11 @@ class LogViewClass(RecycleDataViewBehavior, Label):
     def refresh_view_attrs(self, rv, index, data):
         super(LogViewClass, self).refresh_view_attrs(rv, index, data)
         self.index = index
-        # print (self.selected)
 
-    # def on_touch_down(self, touch):
-    #     if self.collide_point(*touch.pos):
-    #         pass
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            self.parent.select_with_touch(self.index)
+
     def apply_selection(self, is_selected):
         self.selected = is_selected
 
@@ -49,15 +49,11 @@ class LogLayout(AppRecycleView):
         scroll = self.convert_distance_to_scroll(0, self.height)[1] * 0.9
         self.scroll_y = min(self.scroll_y + scroll, 1.0)
 
-    def scroll_to_index(self, index, wheight):
-        # self.scroll_y = (len(self.data) / wheight) * index
-        print (len(self.data), wheight, index)
-        print ('STI ', index)
-
 
 class SelectableRecycleBoxLayout(RecycleBoxLayout):
     selected_widgets = None
-    first_selection = -1
+    sel_first = -1
+    sel_last = -1
 
     def __init__(self, **kwargs):
         super(SelectableRecycleBoxLayout, self).__init__(**kwargs)
@@ -76,34 +72,86 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
         return mode
 
     def on_arrow_up(self):
+        if self.sel_last is 0:
+            return
+
         mode = self.get_modifier_mode()
         if self.children:
-            if self.first_selection == -1:
-                self.first_selection = 0
-                self.selected_widgets = {0}
-            elif not mode:
-                self.first_selection -= 1
-                self.selected_widgets = {self.first_selection}
+            if mode in ('', 'ctrl'):
+                self.sel_first = self.sel_last - 1
+                self.sel_last = self.sel_first
+                self.selected_widgets = {self.sel_first}
+            elif mode == 'shift':
+                new_last = self.sel_last
+                new_last -= 1
+                if new_last >= self.sel_first:
+                    self.add_remove_selected_set(self.sel_last)
+                elif new_last not in self.selected_widgets:
+                    self.add_remove_selected_set(new_last)
+                self.sel_last = new_last
+
         self._update_selected()
         self._scroll_to_selected()
 
     def on_arrow_down(self):
+        if self.sel_last == len(self.parent.data) - 1:
+            return
+
         mode = self.get_modifier_mode()
         if self.children:
-            if self.first_selection == -1:
-                self.first_selection = 0
-                self.selected_widgets = {0}
-            elif not mode:
-                self.first_selection += 1
-                self.selected_widgets = {self.first_selection}
+            if mode in ('', 'ctrl'):
+                self.sel_first = self.sel_last + 1
+                self.sel_last = self.sel_first
+                self.selected_widgets = {self.sel_first}
+            elif mode == 'shift':
+                new_last = self.sel_last
+                new_last += 1
+                if new_last <= self.sel_first:
+                    self.add_remove_selected_set(self.sel_last)
+                elif new_last not in self.selected_widgets:
+                    self.add_remove_selected_set(new_last)
+                self.sel_last = new_last
+
         self._update_selected()
         self._scroll_to_selected()
 
+    def select_with_touch(self, index):
+        mode = self.get_modifier_mode()
+        if self.sel_first == -1:
+            self.sel_first = 0
+
+        if mode in ('', 'ctrl'):
+            self.sel_first = index
+            self.sel_last = self.sel_first
+            if not mode:
+                self.selected_widgets = {self.sel_first}
+            else:
+                self.add_remove_selected_set(index)
+        elif mode == 'shift':
+            self.sel_last = index
+            if self.sel_first < index:
+                start, end = self.sel_first, index
+            else:
+                start, end = index, self.sel_first
+
+            self.selected_widgets = set()
+            for x in range(start, end+1):
+                self.selected_widgets.add(x)
+        self.parent.refresh_from_layout()
+
+    def add_remove_selected_set(self, index, index2=None):
+        if index in self.selected_widgets:
+            self.selected_widgets.remove(index)
+            if index2 and index2 in self.selected_widgets:
+                self.selected_widgets.remove(index2)
+        else:
+            self.selected_widgets.add(index)
+
     def _scroll_to_selected(self):
         for x in self.children:
-            if x.selected:
+            if x.index == self.sel_last:
                 self.parent.scroll_to(
-                    x, padding=self.default_size[1] * 1.0, animate=False)
+                    x, padding=self.default_size[1], animate=False)
 
     def _update_selected(self):
         for x in self.children:
@@ -111,3 +159,7 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
                 x.apply_selection(True)
             else:
                 x.apply_selection(False)
+        print (self.selected_widgets)
+
+    def on_children(self, _, __):
+        self._update_selected()

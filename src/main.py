@@ -8,7 +8,7 @@ from kivy.utils import escape_markup
 from kivy.clock import Clock
 from time import time, sleep
 from kivy.app import App
-from other.test_manager import TestManager
+from other import test_manager
 
 TESTING = True
 
@@ -45,8 +45,7 @@ class LogFruitApp(App):
         self.root.ids.tab_holder.bind(
             current_selection_text=lambda o,v: self.set_filter_text(v))
         if TESTING:
-            self.testmanager = TestManager()
-            self.testmanager.init(self, self.root)
+            test_manager.init(self, self.root)
         return self.root
 
     def on_log_full(self, _, value):
