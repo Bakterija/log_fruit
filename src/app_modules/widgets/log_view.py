@@ -41,6 +41,11 @@ class LogLayout(AppRecycleView):
     def __init__(self, **kwargs):
         super(LogLayout, self).__init__(**kwargs)
 
+    def set_data(self, value):
+        if self.children:
+            self.children[0].on_data_update_sel(len(self.data), len(value))
+        self.data = value
+
     def page_down(self):
         scroll = self.convert_distance_to_scroll(0, self.height)[1] * 0.9
         self.scroll_y = max(self.scroll_y - scroll, 0.0)
@@ -60,6 +65,21 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
         key_binder.add('arrow_up', 273, 'down', self.on_arrow_up)
         key_binder.add('arrow_down', 274, 'down', self.on_arrow_down)
         self.selected_widgets = set()
+
+    def on_data_update_sel(self, len_old, len_new):
+        def next_frame_task(*a):
+            if self.sel_last > len_new:
+                if len_new < len_old:
+                    self.sel_last = len_new - 1
+                    if self.sel_first > len_new - 1:
+                        self.sel_first = self.sel_last
+                    self.selected_widgets.add(self.sel_last)
+                    for i in list(self.selected_widgets):
+                        if i > len_new - 1:
+                            self.selected_widgets.remove(i)
+                    self._update_selected()
+                    self._scroll_to_selected()
+        Clock.schedule_once(next_frame_task, 0)
 
     def get_modifier_mode(self):
         mode = ''
@@ -94,24 +114,23 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
         self._scroll_to_selected()
 
     def on_arrow_down(self):
-        if self.sel_last == len(self.parent.data) - 1:
-            return
-
+        sel_max = len(self.parent.data) - 1
         mode = self.get_modifier_mode()
+
         if self.children:
             if mode in ('', 'ctrl'):
-                self.sel_first = self.sel_last + 1
+                self.sel_first = min(self.sel_last + 1, sel_max)
                 self.sel_last = self.sel_first
                 self.selected_widgets = {self.sel_first}
             elif mode == 'shift':
-                new_last = self.sel_last
-                new_last += 1
-                if new_last <= self.sel_first:
-                    self.add_remove_selected_set(self.sel_last)
-                elif new_last not in self.selected_widgets:
-                    self.add_remove_selected_set(new_last)
-                self.sel_last = new_last
-
+                new_last = min(self.sel_last, sel_max)
+                if new_last != sel_max:
+                    new_last += 1
+                    if new_last <= self.sel_first:
+                        self.add_remove_selected_set(self.sel_last)
+                    elif new_last not in self.selected_widgets:
+                        self.add_remove_selected_set(new_last)
+                    self.sel_last = new_last
         self._update_selected()
         self._scroll_to_selected()
 
@@ -148,10 +167,7 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
             self.selected_widgets.add(index)
 
     def _scroll_to_selected(self):
-        for x in self.children:
-            if x.index == self.sel_last:
-                self.parent.scroll_to(
-                    x, padding=self.default_size[1], animate=False)
+        self.parent.scroll_to_index(self.sel_last)
 
     def _update_selected(self):
         for x in self.children:
@@ -159,7 +175,6 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
                 x.apply_selection(True)
             else:
                 x.apply_selection(False)
-        print (self.selected_widgets)
 
     def on_children(self, _, __):
         self._update_selected()

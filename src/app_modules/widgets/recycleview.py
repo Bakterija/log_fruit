@@ -10,6 +10,37 @@ class AppRecycleView(RecycleView):
     def __init__(self, **kwargs):
         super(AppRecycleView, self).__init__(**kwargs)
 
+    def scroll_to_index(self, index):
+        box = self.children[0]
+        pos_index = (box.default_size[1] + box.spacing) * index
+        scroll = self.convert_distance_to_scroll(
+            0, pos_index - (self.height * 0.5))[1]
+        if scroll > 1.0:
+            scroll = 1.0
+        elif scroll < 0.0:
+            scroll = 0.0
+        self.scroll_y = 1.0 - scroll
+
+    def convert_distance_to_scroll(self, dx, dy):
+        box = self.children[0]
+        wsize = box.default_size[1] + box.spacing
+
+        if not self._viewport:
+            return 0, 0
+        vp = self._viewport
+        vp_height = len(self.data) * wsize
+        if vp.width > self.width:
+            sw = vp.width - self.width
+            sx = dx / float(sw)
+        else:
+            sx = 0
+        if vp_height > self.height:
+            sh = vp_height - self.height
+            sy = dy / float(sh)
+        else:
+            sy = 1
+        return sx, sy
+
     def scroll_to(self, widget, padding=10, animate=True):
         '''Scrolls the viewport to ensure that the given widget is visible,
         optionally with padding and animation. If animate is True (the

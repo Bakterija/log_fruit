@@ -52,7 +52,7 @@ class LogFruitApp(App):
         self._do_update_log = True
 
     def update_rv_data(self, _, value):
-        self.root.ids.rv.data = value
+        self.root.ids.rv.set_data(value)
 
     def set_filter_text(self, value):
         self.filter_text = value
