@@ -2,7 +2,7 @@ from . import key_binder
 
 
 def init_hotkeys(self):
-    # key_binder.log_keys = True
+    key_binder.log_keys = True
     ids = self.root.ids
 
     key_binder.add(

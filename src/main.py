@@ -9,6 +9,8 @@ from kivy.clock import Clock
 from time import time, sleep
 from kivy.app import App
 from other import test_manager
+from kivy.config import Config
+Config.set( 'input', 'mouse', 'mouse,disable_multitouch')
 
 TESTING = True
 

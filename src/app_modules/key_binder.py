@@ -25,8 +25,8 @@ def on_key_down(win, key, *args):
     except:
         modifier = []
 
-    if key == 308:
-        alt_hold = True
+    if key in (308, 1073741824):
+        alt_held = True
     elif key in (305, 306):
         ctrl_held = True
     elif key in (304, 303):
@@ -46,8 +46,8 @@ def on_key_up(win, key, *args):
     if log_keys:
         Logger.info('KeyBinder: on_key___up: {} - {}'.format(key, args))
 
-    if key == 308:
-        alt_hold = False
+    if key in (308, 1073741824):
+        alt_held = False
     elif key in (305, 306):
         ctrl_held = False
     elif key in (304, 303):

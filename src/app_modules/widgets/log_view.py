@@ -30,7 +30,18 @@ class LogViewClass(RecycleDataViewBehavior, Label):
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
-            self.parent.select_with_touch(self.index)
+            if touch.button == 'left':
+                self.left_click(touch)
+            elif touch.button == 'right':
+                self.right_click(touch)
+            return True
+
+    def left_click(self, touch):
+        self.parent.select_with_touch(self.index)
+
+    def right_click(self, touch):
+        self.parent.select_with_touch(self.index)
+        self.parent.open_context_menu(self)
 
     def apply_selection(self, is_selected):
         self.selected = is_selected
@@ -64,6 +75,10 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
         super(SelectableRecycleBoxLayout, self).__init__(**kwargs)
         key_binder.add('arrow_up', 273, 'down', self.on_arrow_up)
         key_binder.add('arrow_down', 274, 'down', self.on_arrow_down)
+        key_binder.add(
+            'select_all', 97, 'down', self.select_all, modifier=['ctrl'])
+        key_binder.add(
+            'context_menu', 1073741942, 'down', self.open_context_menu)
         self.selected_widgets = set()
 
     def on_data_update_sel(self, len_old, len_new):
@@ -158,6 +173,11 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
                 self.selected_widgets.add(x)
         self.parent.refresh_from_layout()
 
+    def select_all(self):
+        for i in range(len(self.parent.data)):
+            self.selected_widgets.add(i)
+        self._update_selected()
+
     def add_remove_selected_set(self, index, index2=None):
         if index in self.selected_widgets:
             self.selected_widgets.remove(index)
@@ -165,6 +185,13 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
                 self.selected_widgets.remove(index2)
         else:
             self.selected_widgets.add(index)
+
+    def open_context_menu(self, button=None):
+        if not button:
+            for x in self.children:
+                if x.index == self.sel_last:
+                    button = x
+        print('IR CTX MENU', button)
 
     def _scroll_to_selected(self):
         self.parent.scroll_to_index(self.sel_last)
