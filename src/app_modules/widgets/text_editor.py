@@ -2,6 +2,7 @@ from kivy.properties import StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.lang import Builder
+from kivy.clock import Clock
 
 
 Builder.load_string('''
@@ -10,6 +11,7 @@ Builder.load_string('''
     TextInput:
         id: input
         multiline: True
+        font_size: logview_font_size
 ''')
 
 
@@ -27,5 +29,8 @@ class TextEditorPopup(Popup):
 
     def open(self, *args):
         super(TextEditorPopup, self).open(*args)
-        self.content.ids.input.focus = True
         self.content.ids.input.text = self.text
+        Clock.schedule_once(self.focus_textinput, 0)
+
+    def focus_textinput(self, *args):
+        self.content.ids.input.focus = True
