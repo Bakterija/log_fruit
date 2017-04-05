@@ -1,38 +1,77 @@
+from app_modules.widgets.text_editor import TextEditorPopup
+from kivy.clock import Clock, mainthread
+from kivy.core.clipboard import Clipboard
 from kivy.app import App
 from . import key_binder
-from kivy.clock import Clock, mainthread
 
-opened_popups = False
+opened_popups = set()
 
 def init():
-    global ROOT, LOG_CONTEXT_MENU
     APP = App.get_running_app()
     ROOT = APP.root
     LOG_VIEW = ROOT.ids.rv
-    LOG_BOX = ROOT.ids.rv
+    LOG_BOX = ROOT.ids.rv.children[0]
     LOG_CONTEXT_MENU = ROOT.ids.context_menu0
     LOG_CONTEXT_MENU.bind(visible=on_cmenu_visible)
+    globals().update(locals())
 
 def open_log_cmenu(pos):
     LOG_CONTEXT_MENU.show(*pos)
 
 def on_cmenu_visible(_, value):
-    global opened_popups
     if value:
-        key_binder.stop()
-        opened_popups = True
+        opened_popup_add('context_menu0')
     else:
-        key_binder.start()
-        Clock.schedule_once(set_opened_popups_false, 0.2)
+        Clock.schedule_once(rem_opened_ctx_menu0, 0.2)
 
-def set_opened_popups_false(dt):
-    global opened_popups
-    opened_popups = False
+def rem_opened_ctx_menu0(dt):
+    opened_popup_remove('context_menu0')
+
+def opened_popup_add(name):
+    opened_popups.add(name)
+    on_opened_popups(opened_popups)
+
+def opened_popup_remove(name):
+    opened_popups.remove(name)
+    on_opened_popups(opened_popups)
+
+def on_opened_popups(value):
+    if value:
+        key_binder.stop_categories('n/a')
+    else:
+        key_binder.start_categories('n/a')
 
 def do_stringinstruction(instr):
     if instr['method'] == 'context_menu0_task':
         text = instr['text']
         if text == 'Edit':
-            print('ED')
+            widget = LOG_BOX.get_widget_from_index(LOG_BOX.sel_last)
+            popup_id = 'text_editor'
+            on_dismiss = lambda a: opened_popup_remove('text_editor')
+            text_editor = TextEditorPopup(
+                on_dismiss=on_dismiss, text=widget.text0)
+            text_editor.open()
+            opened_popup_add(popup_id)
         elif text == 'Copy':
-            print('Copy')
+            widget = LOG_BOX.get_widget_from_index(LOG_BOX.sel_last)
+            Clipboard.copy(widget.text0)
+        LOG_CONTEXT_MENU.hide()
+
+def kb_enter():
+    if LOG_CONTEXT_MENU.visible:
+        LOG_CONTEXT_MENU.select_hovered()
+
+def kb_arrow_up():
+    if LOG_CONTEXT_MENU.visible:
+        LOG_CONTEXT_MENU.arrow_up()
+
+def kb_arrow_down():
+    if LOG_CONTEXT_MENU.visible:
+        LOG_CONTEXT_MENU.arrow_down()
+
+def kb_escape():
+    if opened_popups:
+        if LOG_CONTEXT_MENU.visible:
+            LOG_CONTEXT_MENU.hide()
+    else:
+        APP.stop()

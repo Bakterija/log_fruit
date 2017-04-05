@@ -11,7 +11,6 @@ from kivy.metrics import cm
 from app_modules import key_binder
 from kivy.clock import Clock
 from app_modules import global_thing_handler as globhandler
-# from . import context_menu
 
 
 class LogViewClass(RecycleDataViewBehavior, Label):
@@ -20,10 +19,6 @@ class LogViewClass(RecycleDataViewBehavior, Label):
 
     def __init__(self, **kwargs):
         super(LogViewClass, self).__init__(**kwargs)
-
-    # def on_touch_down(self, touch):
-    #     if self.collide_point(*touch.pos):
-    #         Clipboard.copy(self.text0)
 
     def refresh_view_attrs(self, rv, index, data):
         super(LogViewClass, self).refresh_view_attrs(rv, index, data)
@@ -198,6 +193,12 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
         if not pos:
             return
         globhandler.open_log_cmenu(pos)
+
+    def get_widget_from_index(self, index):
+        for x in self.children:
+            if x.index == index:
+                return x
+        return None
 
     def _scroll_to_selected(self):
         self.parent.scroll_to_index(self.sel_last)

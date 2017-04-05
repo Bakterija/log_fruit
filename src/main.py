@@ -11,7 +11,8 @@ from kivy.app import App
 from other import test_manager
 from kivy.config import Config
 from app_modules import global_thing_handler as globhandler
-Config.set( 'input', 'mouse', 'mouse,disable_multitouch')
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
+Config.set('kivy', 'exit_on_escape', '0')
 
 TESTING = True
 

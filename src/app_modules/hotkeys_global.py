@@ -1,3 +1,4 @@
+from . import global_thing_handler as globhandler
 from . import key_binder
 
 
@@ -5,8 +6,21 @@ def init_hotkeys(self):
     # key_binder.log_keys = True
     ids = self.root.ids
 
-    # key_binder.add('arrow_up', 273, 'down', self)
-    # key_binder.add('arrow_down', 274, 'down', self)
+    key_binder.add(
+        'glb_escape', 27, 'down',
+        globhandler.kb_escape, category='globhandler')
+    key_binder.add(
+        'glb_return', 13, 'down',
+        globhandler.kb_enter, category='globhandler')
+    key_binder.add(
+        'glb_kp_enter', 271, 'down',
+        globhandler.kb_enter, category='globhandler')
+    key_binder.add(
+        'glb_arrow_up', 273, 'down',
+        globhandler.kb_arrow_up, category='globhandler')
+    key_binder.add(
+        'glb_arrow_down', 274, 'down',
+        globhandler.kb_arrow_down, category='globhandler')
 
     key_binder.add(
         'focus_input', 108, 'down',

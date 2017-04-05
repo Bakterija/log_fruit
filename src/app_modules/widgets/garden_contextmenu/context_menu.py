@@ -10,6 +10,9 @@ import kivy.properties as kp
 import os
 
 
+force_mouse_pos = ()
+
+
 class AbstractMenu(object):
     cancel_handler_widget = kp.ObjectProperty(None)
     bounding_box_widget = kp.ObjectProperty(None)
@@ -58,7 +61,10 @@ class AbstractMenu(object):
             self.clock_event = Clock.schedule_interval(partial(self._check_mouse_hover), 0.05)
 
     def _check_mouse_hover(self, obj):
-        self.self_or_submenu_collide_with_point(*Window.mouse_pos)
+        if force_mouse_pos:
+            self.self_or_submenu_collide_with_point(*force_mouse_pos)
+        else:
+            self.self_or_submenu_collide_with_point(*Window.mouse_pos)
 
     def _cancel_hover_timer(self):
         if self.clock_event:
@@ -73,6 +79,34 @@ class ContextMenu(GridLayout, AbstractMenu):
     def __init__(self, *args, **kwargs):
         super(ContextMenu, self).__init__(*args, **kwargs)
         self.orig_parent = None
+
+    def arrow_up(self):
+        self.kb_force_hover(1)
+
+    def arrow_down(self):
+        self.kb_force_hover(-1)
+
+    def kb_force_hover(self, index):
+        global force_mouse_pos
+        found = False
+        for i, x in enumerate(self.children):
+            if not hasattr(x, 'hovered'):
+                continue
+            if x.hovered:
+                if i is 0 and index == -1:
+                    index = 0
+                force_mouse_pos = self.children[i+index].pos
+                found = True
+                break
+        if not found:
+            force_mouse_pos = self.children[-1].pos
+
+    def select_hovered(self):
+        for x in self.children:
+            if not hasattr(x, 'hovered'):
+                continue
+            if x.hovered:
+                x.dispatch('on_release')
 
     def hide(self):
         self.visible = False
