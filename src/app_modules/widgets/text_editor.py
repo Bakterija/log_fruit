@@ -7,16 +7,27 @@ from kivy.clock import Clock
 
 Builder.load_string('''
 <TextEditor>:
-    orientation: 'vertical'
-    TextInput:
-        id: input
-        multiline: True
-        font_size: logview_font_size
+    orientation: 'horizontal'
+    ScrollView:
+        id: scroller
+        bar_width: cm(0.5)
+        TextInput:
+            id: input
+            size_hint: 1, None
+            height: self.minimum_height if root.height < self.minimum_height else root.height
+            multiline: True
+            font_size: logview_font_size
+            on_cursor: root.on_cursor(args[1])
 ''')
 
 
 class TextEditor(BoxLayout):
-    pass
+    def __init__(self, **kwargs):
+        super(TextEditor, self).__init__(**kwargs)
+        # self.ids.input.bind
+
+    def on_cursor(self, value):
+        print(value)
 
 
 class TextEditorPopup(Popup):
@@ -26,6 +37,7 @@ class TextEditorPopup(Popup):
     def __init__(self, **kwargs):
         super(TextEditorPopup, self).__init__(**kwargs)
         self.content = TextEditor()
+        self.size_hint = (0.9, 0.9)
 
     def open(self, *args):
         super(TextEditorPopup, self).open(*args)

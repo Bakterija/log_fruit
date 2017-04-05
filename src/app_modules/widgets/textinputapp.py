@@ -6,7 +6,7 @@ from kivy.app import App
 
 class TApp(App):
     def build(self):
-        root = Label(text='Press "Enter" to open TextInput')
+        root = Button(text='Press "Enter" to open TextInput', on_release=self.open_editor)
         Window.bind(on_key_down=self.on_key_down2)
         return root
 
@@ -14,7 +14,7 @@ class TApp(App):
         if args[1] == 13:
             self.open_editor()
 
-    def open_editor(self):
+    def open_editor(self, *args):
         popup = TextEditorPopup(text='')
         popup.open()
 

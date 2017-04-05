@@ -1,4 +1,4 @@
-from kivy.properties import BooleanProperty, NumericProperty
+from kivy.properties import BooleanProperty, NumericProperty, ListProperty
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
@@ -11,10 +11,12 @@ from kivy.metrics import cm
 from app_modules import key_binder
 from kivy.clock import Clock
 from app_modules import global_thing_handler as globhandler
+from .behaviors import HoverBehavior
 
 
-class LogViewClass(RecycleDataViewBehavior, Label):
+class LogViewClass(HoverBehavior, RecycleDataViewBehavior, Label):
     selected = BooleanProperty(False)
+    background_color = ListProperty([0.2, 0.2, 0.2])
     index = None
 
     def __init__(self, **kwargs):
@@ -43,6 +45,19 @@ class LogViewClass(RecycleDataViewBehavior, Label):
 
     def apply_selection(self, is_selected):
         self.selected = is_selected
+
+    def on_selected(self, _, value):
+        if value:
+            self.background_color = [0.25, 0.35, 0.6]
+        else:
+            self.background_color = [0.2, 0.2, 0.2]
+
+    def on_enter(self):
+        if not self.selected:
+            self.background_color = [0.2, 0.24, 0.35]
+
+    def on_leave(self):
+        self.on_selected(None, self.selected)
 
 
 class LogLayout(AppRecycleView):

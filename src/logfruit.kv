@@ -21,7 +21,7 @@
     markup: True
     canvas.before:
         Color:
-            rgb: (0.25, 0.35, 0.6) if self.selected else (0.2, 0.2, 0.2)
+            rgb: self.background_color
         Rectangle:
             pos: self.pos
             size: self.size

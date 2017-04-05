@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+from kivy.config import Config
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
+Config.set('kivy', 'exit_on_escape', 0)
 from kivy.properties import NumericProperty, ListProperty, StringProperty
 from kivy.uix.floatlayout import FloatLayout
 from app_modules.worker import worker, wlock
 from kivy.uix.boxlayout import BoxLayout
 from app_modules import hotkeys_global
 from kivy.utils import escape_markup
-from kivy.config import Config
 from kivy.clock import Clock
 from time import time, sleep
 from kivy.app import App
@@ -13,8 +15,6 @@ from app_modules import global_thing_handler as globhandler
 from other import test_manager
 from kivy.logger import Logger
 import traceback
-Config.set('input', 'mouse', 'mouse,disable_multitouch')
-Config.set('kivy', 'exit_on_escape', '0')
 
 TESTING = True
 
@@ -138,4 +138,5 @@ if __name__ == '__main__':
         app.run()
     except:
         Logger.error('App: %s' % (traceback.format_exc()))
-        worker.stop()
+        if hasattr(worker, 'proc'):
+            worker.stop()
