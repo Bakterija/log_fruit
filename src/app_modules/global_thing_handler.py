@@ -47,7 +47,7 @@ def do_stringinstruction(instr):
         if text == 'Edit':
             widget = LOG_BOX.get_widget_from_index(LOG_BOX.sel_last)
             popup_id = 'text_editor'
-            on_dismiss = lambda a: opened_popup_remove('text_editor')
+            on_dismiss = lambda a: opened_popup_remove(popup_id)
             text_editor = TextEditorPopup(
                 on_dismiss=on_dismiss, text=widget.text0)
             text_editor.open()

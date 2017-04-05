@@ -1,3 +1,4 @@
+from __future__ import print_function
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.core.window import Window
@@ -11,7 +12,10 @@ import os
 
 
 force_mouse_pos = ()
-
+def remove_forced_mouse(*args):
+    global force_mouse_pos
+    force_mouse_pos = ()
+Window.bind(mouse_pos=remove_forced_mouse)
 
 class AbstractMenu(object):
     cancel_handler_widget = kp.ObjectProperty(None)
