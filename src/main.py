@@ -132,4 +132,7 @@ class LogFruitApp(App):
 
 if __name__ == '__main__':
     app = LogFruitApp()
-    app.run()
+    try:
+        app.run()
+    except:
+        worker.stop()
