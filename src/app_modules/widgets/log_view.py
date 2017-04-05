@@ -188,7 +188,7 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
         if not pos:
             for x in self.children:
                 if x.index == self.sel_last:
-                    pos = x.to_window(*x.pos)
+                    pos = x.to_window(x.right, x.y)
                     break
         if not pos:
             return
