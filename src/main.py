@@ -10,6 +10,7 @@ from time import time, sleep
 from kivy.app import App
 from other import test_manager
 from kivy.config import Config
+from app_modules import global_thing_handler as globhandler
 Config.set( 'input', 'mouse', 'mouse,disable_multitouch')
 
 TESTING = True
@@ -98,6 +99,9 @@ class LogFruitApp(App):
             len(self.worker.queue), self.worker.added_msg)
         self.log_filtered_len = len(self.log_filtered)
 
+    def globhandler_instruction(self, instr):
+        globhandler.do_stringinstruction(instr)
+
     def clear_logs(self):
         self.log_full = []
         self.log_filtered = []
@@ -115,6 +119,9 @@ class LogFruitApp(App):
         del self.fps_log[0]
         self.fps_log.append(new_time)
         self.fps = int(1.0 / (alltime / len(self.fps_log)))
+
+    def on_start(self):
+        globhandler.init()
 
     def on_stop(self):
         self.stop_worker()

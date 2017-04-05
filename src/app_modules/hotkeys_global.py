@@ -2,8 +2,11 @@ from . import key_binder
 
 
 def init_hotkeys(self):
-    key_binder.log_keys = True
+    # key_binder.log_keys = True
     ids = self.root.ids
+
+    # key_binder.add('arrow_up', 273, 'down', self)
+    # key_binder.add('arrow_down', 274, 'down', self)
 
     key_binder.add(
         'focus_input', 108, 'down',

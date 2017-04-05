@@ -1,16 +1,17 @@
+from kivy.properties import BooleanProperty, NumericProperty
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
-# from kivy.uix.recycleview import RecycleView
 from .recycleview import AppRecycleView
 from kivy.uix.behaviors import FocusBehavior
-from kivy.properties import BooleanProperty, NumericProperty
 from kivy.core.clipboard import Clipboard
 from kivy.uix.label import Label
 from kivy.logger import Logger
 from kivy.metrics import cm
 from app_modules import key_binder
 from kivy.clock import Clock
+from app_modules import global_thing_handler as globhandler
+# from . import context_menu
 
 
 class LogViewClass(RecycleDataViewBehavior, Label):
@@ -29,6 +30,8 @@ class LogViewClass(RecycleDataViewBehavior, Label):
         self.index = index
 
     def on_touch_down(self, touch):
+        if globhandler.opened_popups:
+            return False
         if self.collide_point(*touch.pos):
             if touch.button == 'left':
                 self.left_click(touch)
@@ -41,7 +44,7 @@ class LogViewClass(RecycleDataViewBehavior, Label):
 
     def right_click(self, touch):
         self.parent.select_with_touch(self.index)
-        self.parent.open_context_menu(self)
+        self.parent.open_context_menu(pos=self.to_window(*touch.pos))
 
     def apply_selection(self, is_selected):
         self.selected = is_selected
@@ -186,12 +189,15 @@ class SelectableRecycleBoxLayout(RecycleBoxLayout):
         else:
             self.selected_widgets.add(index)
 
-    def open_context_menu(self, button=None):
-        if not button:
+    def open_context_menu(self, pos=None):
+        if not pos:
             for x in self.children:
                 if x.index == self.sel_last:
-                    button = x
-        print('IR CTX MENU', button)
+                    pos = x.to_window(*x.pos)
+                    break
+        if not pos:
+            return
+        globhandler.open_log_cmenu(pos)
 
     def _scroll_to_selected(self):
         self.parent.scroll_to_index(self.sel_last)

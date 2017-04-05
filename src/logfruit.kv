@@ -4,6 +4,8 @@
 #: import SelectableRecycleBoxLayout app_modules.widgets.log_view.SelectableRecycleBoxLayout
 #: import RecycleDataBox app_modules.widgets.databox.recycle_databox.RecycleDataBox
 #: import TabHolder app_modules.widgets.filter_tabs.TabHolder
+#: import ContextMenu app_modules.widgets.garden_contextmenu.ContextMenu
+#: import ContextMenuTextItem app_modules.widgets.garden_contextmenu.ContextMenuTextItem
 
 
 <LogViewClass>:
@@ -24,6 +26,7 @@
             size: self.size
 
 <RootWidget>:
+    id: root22
     orientation: 'vertical'
     canvas.before:
         Color:
@@ -134,3 +137,17 @@
             font_size: self.height * 0.5
             width: self.font_size * 4
             text: 'FPS: %s' % (app.fps)
+
+        FloatLayout:
+            id: floater
+
+            ContextMenu:
+                id: context_menu0
+                visible: False
+                cancel_handler_widget: floater
+                ContextMenuTextItem:
+                    text: 'Edit'
+                    on_release: app.globhandler_instruction({'method':'context_menu0_task', 'text': self.text})
+                ContextMenuTextItem:
+                    text: 'Copy'
+                    on_release: app.globhandler_instruction({'method':'context_menu0_task', 'text': self.text})
