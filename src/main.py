@@ -23,7 +23,6 @@ class RootWidget(BoxLayout):
     def focus_iput(self, *args):
         self.ids.filter_input.focus = True
         self.ids.filter_input.select_all()
-        self.ids.rv.scroll_y = 0.5
 
 
 class LogFruitApp(App):
@@ -54,6 +53,9 @@ class LogFruitApp(App):
             test_manager.init(self, self.root)
         return self.root
 
+    def on_filter_text(self, _, value):
+        self.root.ids.filter_input.text = value
+
     def on_log_full(self, _, value):
         self._do_update_log = True
 
@@ -61,6 +63,7 @@ class LogFruitApp(App):
         self.root.ids.rv.set_data(value)
 
     def set_filter_text(self, value):
+        self.root.ids.tab_holder.set_current_text(value)
         self.filter_text = value
         self.refilter_logs()
         self.log_filtered_len = len(self.log_filtered)
@@ -70,16 +73,18 @@ class LogFruitApp(App):
             filter_len = len(self.filter_text)
             new_logs = []
             for x in self.log_full:
-                b = x['text0'].find(self.filter_text)
+                b = x['text0'].lower().find(self.filter_text.lower())
                 if b != -1:
                     c = b + filter_len
                     start = escape_markup(x['text0'][:b])
                     end = escape_markup(x['text0'][c:])
-                    mid = x['text0'][b:c].replace(
-                        self.filter_text,
-                        '[color=%s]%s[/color]' % (
-                            self.highlight_color,
-                            escape_markup(self.filter_text)))
+                    # mid = x['text0'][b:c].replace(
+                    #     self.filter_text,
+                    #     '[color=%s]%s[/color]' % (
+                    #         self.highlight_color,
+                    #         escape_markup(self.filter_text)))
+                    mid = '[color=%s]%s[/color]' % (
+                        self.highlight_color, escape_markup(x['text0'][b:c]))
                     text = ''.join((start, mid, end))
                     new_logs.append(
                         {'time': x['time'], 'text': text, 'text0': x['text0']})

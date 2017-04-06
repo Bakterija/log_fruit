@@ -73,6 +73,9 @@ class TabHolder(BoxLayout):
         widget.selected = True
         self.current_selection_text = widget.text
 
+    def set_current_text(self, text):
+        self.current_selection.text = text
+
 
 class FilterTab(Button):
     selected = BooleanProperty()
