@@ -11,7 +11,7 @@ from kivy.utils import escape_markup
 from kivy.clock import Clock
 from time import time, sleep
 from kivy.app import App
-from app_modules import global_thing_handler as globhandler
+from app_modules import global_things as globhandler
 from other import test_manager
 from kivy.logger import Logger
 import traceback

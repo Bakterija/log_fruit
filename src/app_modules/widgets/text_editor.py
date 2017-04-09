@@ -18,16 +18,22 @@ Builder.load_string('''
             multiline: True
             font_size: logview_font_size
             on_cursor: root.on_cursor(args[1])
+            on_cursor_row: root.on_cursor_row(args[1])
 ''')
 
 
 class TextEditor(BoxLayout):
     def __init__(self, **kwargs):
         super(TextEditor, self).__init__(**kwargs)
-        # self.ids.input.bind
 
     def on_cursor(self, value):
-        print(value)
+        pass
+
+    def on_cursor_row(self, value):
+        max_lines = int(self.ids.input.height / self.ids.input.line_height)
+        prc = value / max_lines
+        # print (value, max_lines, prc)
+        self.ids.scroller.scroll_y = 1.0 - prc
 
 
 class TextEditorPopup(Popup):

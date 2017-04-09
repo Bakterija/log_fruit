@@ -45,11 +45,14 @@ def do_stringinstruction(instr):
     if instr['method'] == 'context_menu0_task':
         text = instr['text']
         if text == 'Edit':
-            widget = LOG_BOX.get_widget_from_index(LOG_BOX.sel_last)
+            # selected = LOG_BOX.get_widget_from_index(LOG_BOX.selected_widgets)
+            text = ''
+            for x in LOG_BOX.selected_widgets:
+                text = ''.join((text, LOG_VIEW.data[x]['text0'], '\n'))
             popup_id = 'text_editor'
             on_dismiss = lambda a: opened_popup_remove(popup_id)
             text_editor = TextEditorPopup(
-                on_dismiss=on_dismiss, text=widget.text0)
+                on_dismiss=on_dismiss, text=text)
             text_editor.open()
             opened_popup_add(popup_id)
         elif text == 'Copy':

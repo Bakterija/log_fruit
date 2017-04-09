@@ -1,4 +1,4 @@
-from . import global_thing_handler as globhandler
+from . import global_things as globhandler
 from . import key_binder
 
 

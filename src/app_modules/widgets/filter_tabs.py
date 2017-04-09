@@ -15,8 +15,7 @@ class TabHolder(BoxLayout):
 
     def __init__(self, **kwargs):
         super(TabHolder, self).__init__(**kwargs)
-        for x in range(3):
-            self.add_filter(str(x))
+        self.add_filter('')
 
     def add_filter(self, text='', select=True):
         if len(self.children) < self.max_children:
