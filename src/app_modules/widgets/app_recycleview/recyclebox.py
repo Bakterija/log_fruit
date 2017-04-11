@@ -148,9 +148,15 @@ class AppRecycleBox(RecycleBoxLayout):
     def _update_selected(self):
         for x in self.children:
             if x.index in self.selected_widgets:
-                x.apply_selection(True)
+                if not x.selected:
+                    x.apply_selection(True)
             else:
-                x.apply_selection(False)
+                if x.selected:
+                    x.apply_selection(False)
+            if x.selected_last and x.index != self.sel_last:
+                x.selected_last = False
+            elif x.index == self.sel_last:
+                x.selected_last = True
 
     def on_children(self, _, __):
         self._update_selected()

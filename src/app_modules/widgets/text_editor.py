@@ -19,7 +19,7 @@ Builder.load_string('''
             font_size: logview_font_size
             on_cursor: root.on_cursor(args[1])
             on_cursor_row: root.on_cursor_row(args[1])
-            cursor_width: cm(0.1)
+            cursor_width: cm(0.07)
             cursor_color: 0.2, 0.4, 0.7, 1.0
 ''')
 
