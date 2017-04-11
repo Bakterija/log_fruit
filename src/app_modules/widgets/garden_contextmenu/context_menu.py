@@ -9,6 +9,7 @@ from functools import partial
 
 import kivy.properties as kp
 import os
+from kivy.metrics import cm
 
 
 force_mouse_pos = ()
@@ -79,10 +80,19 @@ class AbstractMenu(object):
 class ContextMenu(GridLayout, AbstractMenu):
     visible = kp.BooleanProperty(False)
     spacer = kp.ObjectProperty(None)
+    min_y = cm(1.2)
 
     def __init__(self, *args, **kwargs):
         super(ContextMenu, self).__init__(*args, **kwargs)
         self.orig_parent = None
+
+    def on_pos(self, _, value):
+        if self.y < self.min_y:
+            self.y = self.min_y
+
+    def on_size(self, _, value):
+        if self.y < self.min_y:
+            self.y = self.min_y
 
     def arrow_up(self):
         self.kb_force_hover(1)
