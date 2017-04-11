@@ -7,6 +7,21 @@ from kivy.animation import Animation
 
 class AppRecycleView(RecycleView):
 
+    def set_data(self, value):
+        if self.children:
+            self.children[0].on_data_update_sel(len(self.data), len(value))
+        self.data = value
+
+    def page_down(self):
+        scroll = self.convert_distance_to_scroll(0, self.height)[1] * 0.9
+        self.scroll_y = max(self.scroll_y - scroll, 0.0)
+        self._update_effect_bounds()
+
+    def page_up(self):
+        scroll = self.convert_distance_to_scroll(0, self.height)[1] * 0.9
+        self.scroll_y = min(self.scroll_y + scroll, 1.0)
+        self._update_effect_bounds()
+
     def scroll_to_index(self, index):
         box = self.children[0]
         pos_index = (box.default_size[1] + box.spacing) * index
@@ -37,16 +52,3 @@ class AppRecycleView(RecycleView):
         else:
             sy = 1
         return sx, sy
-
-    def set_data(self, value):
-        if self.children:
-            self.children[0].on_data_update_sel(len(self.data), len(value))
-        self.data = value
-
-    def page_down(self):
-        scroll = self.convert_distance_to_scroll(0, self.height)[1] * 0.9
-        self.scroll_y = max(self.scroll_y - scroll, 0.0)
-
-    def page_up(self):
-        scroll = self.convert_distance_to_scroll(0, self.height)[1] * 0.9
-        self.scroll_y = min(self.scroll_y + scroll, 1.0)

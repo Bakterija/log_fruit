@@ -82,6 +82,8 @@
         scroll_type: ['bars', 'content']
         scroll_wheel_distance: dp(114)
         bar_width: scrollview_bar_width
+        bar_color: col_satblue if self.scroll_y == 0.0 else col_grey
+        bar_inactive_color: col_satblue if self.scroll_y == 0.0 else col_grey
         viewclass: 'LogViewClass'
 
         SelectableRecycleBoxLayout:
