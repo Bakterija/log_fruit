@@ -50,7 +50,7 @@ class TextEditor(BoxLayout):
             visible_last = max_lines
 
         prc = 0.0
-        if row > 0.0 and max_lines > 0.0:
+        if row > 0.0 and mrem_lines > 0.0:
             prc = row / mrem_lines
 
         conv_lh = self.ids.scroller.convert_distance_to_scroll(
@@ -76,4 +76,7 @@ class TextEditorPopup(Popup):
         Clock.schedule_once(self.focus_textinput, 0)
 
     def focus_textinput(self, *args):
-        self.content.ids.input.focus = True
+        winput = self.content.ids.input
+        winput.focus = True
+        winput.cursor = (0, 0)
+        # print ('DDD', winput.pos, winput.to_window(*winput.pos))

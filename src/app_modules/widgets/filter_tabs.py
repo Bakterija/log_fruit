@@ -6,6 +6,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.lang import Builder
 from time import time, sleep
+from kivy.uix.label import Label
 
 
 class TabHolder(BoxLayout):
@@ -42,10 +43,8 @@ class TabHolder(BoxLayout):
             self.remove_widget(rem)
 
     def select_index(self, index):
-        try:
+        if index < len(self.children) + 1:
             self.select_filter(self.children[-index])
-        except Exception as e:
-            print(e)
 
     def select_previous(self):
         for i, x in enumerate(self.children):
@@ -82,6 +81,7 @@ class FilterTab(Button):
 
     def __init__(self, **kwargs):
         super(FilterTab, self).__init__(**kwargs)
+        # self.border = [2, 1, 2, 1]
 
     def on_release(self):
         self.parent.select_filter(self)
@@ -98,4 +98,11 @@ Builder.load_string('''
     font_size: self.height * 0.5
     background_normal: 'images/blue_dark.png' if self.selected else 'images/blue_greyer.png'
     background_down: 'images/blue_bright.png'
+    # canvas:
+    #     Color:
+    #         rgba: col_dblue if self.selected else col_grey
+    #     RoundedRectangle:
+    #         pos: self.pos
+    #         size: self.size
+    #         radius: [(10.0, 6.0), (10.0, 6.0), (0.0, 0.0), (0.0, 0.0)]
 ''')
