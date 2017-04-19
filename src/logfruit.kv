@@ -7,12 +7,12 @@
 #: import ContextMenu app_modules.widgets.garden_contextmenu.ContextMenu
 #: import ContextMenuTextItem app_modules.widgets.garden_contextmenu.ContextMenuTextItem
 #: import TextEditorPopup app_modules.widgets.text_editor.TextEditorPopup
-
+#: import FindBar app_modules.widgets.find_bar.FindBar
 
 <LogViewClass>:
-    size_hint: 1, 1
+    size_hint: 1, None
     font_size: logview_font_size
-    height: logview_height
+    default_height: logview_height
     color: col_white
     text_size: self.size
     halign: 'left'
@@ -38,11 +38,16 @@
 
     TabHolder:
         id: tab_holder
-        size_hint: 1, 0.05
+        size_hint: 1, None
+        height: int(cm(1))
+        pos_hint: {'top': 1.0}
 
     BoxLayout:
+        id: filter_input_box
         orientation: 'horizontal'
-        size_hint: 1, 0.05
+        size_hint: 1, None
+        height: int(cm(1))
+        top: tab_holder.y
         canvas.before:
             Color:
                 rgba: col_dgrey
@@ -78,7 +83,9 @@
 
     LogLayout:
         id: rv
-        size_hint: 1, 0.85
+        size_hint: 1, None
+        pos: 0, find_bar.y + find_bar.height
+        height: filter_input_box.y - bot_bar.height - find_bar.height
         scroll_type: ['bars', 'content']
         scroll_wheel_distance: dp(114)
         bar_width: scrollview_bar_width
@@ -95,8 +102,17 @@
             default_size: None, logview_height
             spacing: int(cm(0.05))
 
+    FindBar:
+        id: find_bar
+        size_hint_y: None
+        height: 0
+        pos: 0, bot_bar.top
+
     BoxLayout:
-        size_hint: 1, 0.05
+        id: bot_bar
+        size_hint: 1, None
+        height: int(cm(1))
+        pos: 0, 0
         orientation: 'horizontal'
         canvas.before:
             Color:

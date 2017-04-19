@@ -3,7 +3,7 @@ from . import key_binder
 
 
 def init_hotkeys(self):
-    key_binder.log_keys = True
+    # key_binder.log_keys = True
     ids = self.root.ids
 
     key_binder.add(
@@ -50,6 +50,10 @@ def init_hotkeys(self):
             lambda i=i: self.root.ids.tab_holder.select_index(i),
             modifier=['alt']
         )
+
+    key_binder.add(
+        'find_bar_toggle', 102, 'down',
+        self.root.toggle_find_bar, modifier=['ctrl'])
 
 def page_up_or_prev_tab(self):
     if key_binder.ctrl_held:

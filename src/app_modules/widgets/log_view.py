@@ -20,7 +20,7 @@ from time import time
 class LogViewClass(HoverBehavior, RecycleDataViewBehavior, Label):
     selected = BooleanProperty(False)
     selected_last = BooleanProperty(False)
-    default_height = int(cm(1.2))
+    default_height = NumericProperty()
     background_color = ListProperty([0.2, 0.2, 0.2])
     color_selected = ListProperty([0.25, 0.35, 0.6])
     color_hovering = ListProperty([0.2, 0.24, 0.35])
@@ -29,10 +29,13 @@ class LogViewClass(HoverBehavior, RecycleDataViewBehavior, Label):
 
     def __init__(self, **kwargs):
         super(LogViewClass, self).__init__(**kwargs)
+        self.shorten = True
+        self.shorten_from = 'right'
 
     def refresh_view_attrs(self, rv, index, data):
         super(LogViewClass, self).refresh_view_attrs(rv, index, data)
         self.index = index
+        self.long_text = data['text']
         if self.selected_last:
             if not self.parent:
                 self.selected_last = False
@@ -67,20 +70,22 @@ class LogViewClass(HoverBehavior, RecycleDataViewBehavior, Label):
             self.background_color = self.color_default
 
     def on_selected_last(self, _, value):
-        pass
-        # if value:
-        #     if self.index == self.parent.sel_last:
-        #         self.text_size = [self.width, None]
-        #         self.texture_update()
-        #         if self.texture_size[1] > self.default_height:
-        #             self.height = int(self.texture_size[1])
-        #         else:
-        #             self.text_size[1] = self.default_height
-        # else:
-        #     self.height = self.default_height
-        #     self.text_size = self.size
-        #     self.texture_update()
-
+        if value:
+            self.shorten = False
+            self.max_lines = 0
+            self.text = self.long_text
+            if self.index == self.parent.sel_last:
+                self.text_size = [self.width, None]
+                self.texture_update()
+                if self.texture_size[1] > self.default_height:
+                    self.height = int(self.texture_size[1])
+                else:
+                    self.text_size[1] = self.default_height
+        else:
+            self.height = self.default_height
+            self.text_size = self.size
+            self.shorten = True
+            self.texture_update()
 
     def on_enter(self):
         if not self.selected:

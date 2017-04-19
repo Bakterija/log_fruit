@@ -3,16 +3,17 @@ from kivy.config import Config
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 Config.set('kivy', 'exit_on_escape', 0)
 from kivy.properties import NumericProperty, ListProperty, StringProperty
-from app_modules.widgets.find_dialog import FindDialog
 from kivy.uix.floatlayout import FloatLayout
 from app_modules.worker import worker, wlock
 from kivy.uix.boxlayout import BoxLayout
 from app_modules import hotkeys_global
 from kivy.utils import escape_markup
+from kivy.animation import Animation
 from kivy.clock import Clock
 from time import time, sleep
 from kivy.app import App
 from app_modules import global_things as globhandler
+from kivy.metrics import cm, dp
 from other import test_manager
 from kivy.logger import Logger
 import traceback
@@ -20,10 +21,19 @@ import traceback
 TESTING = True
 
 
-class RootWidget(BoxLayout):
+class RootWidget(FloatLayout):
     def focus_iput(self, *args):
         self.ids.filter_input.focus = True
         self.ids.filter_input.select_all()
+
+    def toggle_find_bar(self, *args):
+        fbar = self.ids.find_bar
+        if fbar.height:
+            anim = Animation(height=0.0, d=0.5)
+            anim.start(fbar)
+        else:
+            anim = Animation(height=cm(2.0), d=0.5)
+            anim.start(fbar)
 
 
 class LogFruitApp(App):
@@ -52,7 +62,6 @@ class LogFruitApp(App):
             current_selection_text=lambda o,v: self.set_filter_text(v))
         if TESTING:
             test_manager.init(self, self.root)
-        self.fin = FindDialog()
         return self.root
 
     def on_filter_text(self, _, value):
