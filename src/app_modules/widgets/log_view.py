@@ -67,16 +67,19 @@ class LogViewClass(HoverBehavior, RecycleDataViewBehavior, Label):
             self.background_color = self.color_default
 
     def on_selected_last(self, _, value):
-        if value:
-            if self.index == self.parent.sel_last:
-                self.text_size = [self.width, None]
-                self.texture_update()
-                if self.texture_size[1] > self.height:
-                    self.height = int(self.texture_size[1])
-        else:
-            self.height = self.default_height
-            self.text_size = self.size
-            self.texture_update()
+        pass
+        # if value:
+        #     if self.index == self.parent.sel_last:
+        #         self.text_size = [self.width, None]
+        #         self.texture_update()
+        #         if self.texture_size[1] > self.default_height:
+        #             self.height = int(self.texture_size[1])
+        #         else:
+        #             self.text_size[1] = self.default_height
+        # else:
+        #     self.height = self.default_height
+        #     self.text_size = self.size
+        #     self.texture_update()
 
 
     def on_enter(self):

@@ -13,7 +13,7 @@ def init(app, root):
     APP, ROOT = app, root
     RV = root.ids.rv
     Clock.schedule_once(first_frame, 0)
-    Clock.schedule_once(after2sec, 2)
+    Clock.schedule_once(after1sec, 1)
     Clock.schedule_interval(every_sec, 1)
 
 def first_frame(*args):
@@ -22,8 +22,9 @@ def first_frame(*args):
         for data in fake_data.data:
             APP.log_full.append(data)
 
-def after2sec(*args):
-    Logger.info('TestManager: after2sec')
+def after1sec(*args):
+    Logger.info('TestManager: after1sec')
+    # APP.fin.open()
 
 def every_sec(*args):
     if ROOT.ids.rv.scroll_y == 0.0:

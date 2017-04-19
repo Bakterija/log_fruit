@@ -3,6 +3,7 @@ from kivy.config import Config
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 Config.set('kivy', 'exit_on_escape', 0)
 from kivy.properties import NumericProperty, ListProperty, StringProperty
+from app_modules.widgets.find_dialog import FindDialog
 from kivy.uix.floatlayout import FloatLayout
 from app_modules.worker import worker, wlock
 from kivy.uix.boxlayout import BoxLayout
@@ -51,6 +52,7 @@ class LogFruitApp(App):
             current_selection_text=lambda o,v: self.set_filter_text(v))
         if TESTING:
             test_manager.init(self, self.root)
+        self.fin = FindDialog()
         return self.root
 
     def on_filter_text(self, _, value):

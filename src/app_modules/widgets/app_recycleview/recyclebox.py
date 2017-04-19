@@ -7,6 +7,7 @@ class AppRecycleBox(RecycleBoxLayout):
     selected_widgets = None
     sel_first = -1
     sel_last = -1
+    desel_index = 0
 
     def __init__(self, **kwargs):
         super(AppRecycleBox, self).__init__(**kwargs)
@@ -14,6 +15,8 @@ class AppRecycleBox(RecycleBoxLayout):
         key_binder.add('arrow_down', 274, 'down', self.on_arrow_down)
         key_binder.add(
             'select_all', 97, 'down', self.select_all, modifier=['ctrl'])
+        key_binder.add(
+            'deselect_all', 32, 'down', self.deselect_all, modifier=['ctrl'])
         key_binder.add(
             'context_menu', 1073741942, 'down', self.open_context_menu)
         self.selected_widgets = set()
@@ -44,6 +47,10 @@ class AppRecycleBox(RecycleBoxLayout):
         return mode
 
     def on_arrow_up(self):
+        if self.desel_index and self.sel_last == -1:
+            self.sel_last = self.desel_index
+            self.desel_index = 0
+
         if self.sel_last is 0:
             return
 
@@ -66,6 +73,10 @@ class AppRecycleBox(RecycleBoxLayout):
         self._scroll_to_selected()
 
     def on_arrow_down(self):
+        if self.desel_index and self.sel_last == -1:
+            self.sel_last = self.desel_index
+            self.desel_index = 0
+
         sel_max = len(self.parent.data) - 1
         mode = self.get_modifier_mode()
 
@@ -113,6 +124,13 @@ class AppRecycleBox(RecycleBoxLayout):
     def select_all(self):
         for i in range(len(self.parent.data)):
             self.selected_widgets.add(i)
+        self._update_selected()
+
+
+    def deselect_all(self):
+        self.selected_widgets = set()
+        self.desel_index = self.sel_last
+        self.sel_first, self.sel_last = -1, -1
         self._update_selected()
 
     def add_remove_selected_set(self, index, index2=None):

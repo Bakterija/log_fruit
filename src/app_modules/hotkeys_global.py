@@ -3,7 +3,7 @@ from . import key_binder
 
 
 def init_hotkeys(self):
-    # key_binder.log_keys = True
+    key_binder.log_keys = True
     ids = self.root.ids
 
     key_binder.add(
@@ -34,20 +34,8 @@ def init_hotkeys(self):
         'tab_remove', 119, 'down',
         self.root.ids.tab_holder.remove_filter, modifier=['ctrl'])
 
-    def page_up_or_prev_tab():
-        if key_binder.ctrl_held:
-            self.root.ids.tab_holder.select_previous()
-        else:
-            self.root.ids.rv.page_up()
-
-    def page_down_or_next_tab():
-        if key_binder.ctrl_held:
-            self.root.ids.tab_holder.select_next()
-        else:
-            self.root.ids.rv.page_down()
-
-    key_binder.add('page_tab_prev', 280, 'down', page_up_or_prev_tab)
-    key_binder.add('page_tab_next', 281, 'down', page_down_or_next_tab)
+    key_binder.add('page_tab_prev', 280, 'down', lambda *a: page_up_or_prev_tab(self))
+    key_binder.add('page_tab_next', 281, 'down', lambda *a: page_down_or_next_tab(self))
 
     key_binder.add(
         'scroll_home', 278, 'down',
@@ -62,3 +50,15 @@ def init_hotkeys(self):
             lambda i=i: self.root.ids.tab_holder.select_index(i),
             modifier=['alt']
         )
+
+def page_up_or_prev_tab(self):
+    if key_binder.ctrl_held:
+        self.root.ids.tab_holder.select_previous()
+    else:
+        self.root.ids.rv.page_up()
+
+def page_down_or_next_tab(self):
+    if key_binder.ctrl_held:
+        self.root.ids.tab_holder.select_next()
+    else:
+        self.root.ids.rv.page_down()

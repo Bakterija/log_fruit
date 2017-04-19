@@ -79,4 +79,3 @@ class TextEditorPopup(Popup):
         winput = self.content.ids.input
         winput.focus = True
         winput.cursor = (0, 0)
-        # print ('DDD', winput.pos, winput.to_window(*winput.pos))
