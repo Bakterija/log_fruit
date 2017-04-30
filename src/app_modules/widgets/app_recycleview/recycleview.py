@@ -6,11 +6,14 @@ from kivy.animation import Animation
 
 
 class AppRecycleView(RecycleView):
+    datalen = 0
 
     def set_data(self, value):
+        self.datalen = len(value)
         if self.children:
-            self.children[0].on_data_update_sel(len(self.data), len(value))
+            self.children[0].on_data_update_sel(self.datalen, len(value))
         self.data = value
+
 
     def page_down(self):
         scroll = self.convert_distance_to_scroll(0, self.height)[1] * 0.9
@@ -40,7 +43,7 @@ class AppRecycleView(RecycleView):
         if not self._viewport:
             return 0, 0
         vp = self._viewport
-        vp_height = len(self.data) * wheight
+        vp_height = self.datalen * wheight
         if vp.width > self.width:
             sw = vp.width - self.width
             sx = dx / float(sw)
