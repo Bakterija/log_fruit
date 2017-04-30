@@ -18,7 +18,7 @@ from other import test_manager
 from kivy.logger import Logger
 import traceback
 
-TESTING = True
+TESTING = False
 
 
 class RootWidget(FloatLayout):

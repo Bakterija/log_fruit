@@ -121,23 +121,23 @@
                 pos: self.pos
                 size: self.size
 
-        Label:
-            size_hint_x: 0.22
-            font_size: self.height * 0.5
-            width: self.texture_size[0], None
-            text: 'WLOG LEN: %s' % (app.log_full_len2)
+        # Label:
+        #     size_hint_x: 0.22
+        #     font_size: self.height * 0.5
+        #     width: self.texture_size[0], None
+        #     text: 'WLOG LEN: %s' % (app.log_full_len2)
 
         Label:
-            size_hint_x: 0.21
+            size_hint_x: 0.4
             font_size: self.height * 0.5
-            width: self.texture_size[0], None
+            # width: self.texture_size[0], None
             text: app.len_log_full
             text: 'LOG LEN: %s' % (app.log_full_len)
 
         Label:
-            size_hint_x: 0.22
+            size_hint_x: 0.4
             font_size: self.height * 0.5
-            width: self.texture_size[0], None
+            # width: self.texture_size[0], None
             text: 'FLOG LEN: %s' % (app.log_filtered_len)
 
         Button:
@@ -150,12 +150,12 @@
             text: 'Clear'
             on_release: app.clear_logs()
 
-        Label:
-            size_hint: 0.1, 1
-            text: 'Filter'
-            font_size: self.height * 0.5
-            width: self.font_size * 4
-            text: 'FPS: %s' % (app.fps)
+        # Label:
+        #     size_hint: 0.1, 1
+        #     text: 'Filter'
+        #     font_size: self.height * 0.5
+        #     width: self.font_size * 4
+        #     text: 'FPS: %s' % (app.fps)
 
         FloatLayout:
             id: floater
