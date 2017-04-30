@@ -397,8 +397,8 @@ class ShellWidget(Widget):
         else:
             rem_index, add_index = self.parent.move_view_bot()
 
-##        print ('{}: swap_one: {} to {}'.format(
-##            self.place.upper(), rem_index, add_index))
+        # print ('{}: swap_one: {} to {}'.format(
+        #     self.place.upper(), rem_index, add_index))
 
         self.remove_widget(index=rem_index)
         self.other.add_widget(index=add_index)

@@ -1,10 +1,13 @@
 from kivy.event import EventDispatcher
 from kivy.logger import Logger
 from threading import Thread
-from queue import Queue, Empty
 from time import time, sleep
 import subprocess
-
+try:
+    from queue import Queue, Empty
+except:
+    from Queue import Queue, Empty
+    
 
 class wlock():
     def __enter__(self):

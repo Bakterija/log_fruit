@@ -1,19 +1,40 @@
 #!/usr/bin/env python3
+from kivy.config import Config
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
+Config.set('kivy', 'exit_on_escape', 0)
 from kivy.properties import NumericProperty, ListProperty, StringProperty
 from kivy.uix.floatlayout import FloatLayout
-from app_modules.worker import Worker, wlock
+from app_modules.worker import worker, wlock
 from kivy.uix.boxlayout import BoxLayout
-from app_modules import key_binder
+from app_modules import hotkeys_global
 from kivy.utils import escape_markup
+from kivy.animation import Animation
 from kivy.clock import Clock
 from time import time, sleep
 from kivy.app import App
+from app_modules import global_things as globhandler
+from kivy.metrics import cm, dp
+from other import test_manager
+from kivy.logger import Logger
+import traceback
+
+TESTING = False
 
 
-class RootWidget(BoxLayout):
+class RootWidget(FloatLayout):
     def focus_iput(self, *args):
         self.ids.filter_input.focus = True
         self.ids.filter_input.select_all()
+
+    def toggle_find_bar(self, *args):
+        fbar = self.ids.find_bar
+        if fbar.height:
+            anim = Animation(height=0.0, d=0.5)
+            anim.start(fbar)
+        else:
+            anim = Animation(height=cm(2.0), d=0.5)
+            anim.start(fbar)
+
 
 class LogFruitApp(App):
     highlight_color = StringProperty('#00BFFF')
@@ -27,23 +48,33 @@ class LogFruitApp(App):
     log_queued = []
     fps = NumericProperty()
     fps_log = list(range(10))
+    _do_update_log = False
 
     def build(self):
-        self.worker = Worker()
+        self.worker = worker
         self.root = RootWidget()
         self.bind(log_filtered=self.update_rv_data)
-        key_binder.add(
-            'focus_iput', '108', 'down', self.root.focus_iput, modifier=['ctrl'])
-        # key_binder.log_keys = True
         Clock.schedule_interval(self.read_logs, 0.5)
         Clock.schedule_interval(self.update_fps, 0)
         Clock.schedule_once(self.worker.start, 0)
+        hotkeys_global.init_hotkeys(self)
+        self.root.ids.tab_holder.bind(
+            current_selection_text=lambda o,v: self.set_filter_text(v))
+        if TESTING:
+            test_manager.init(self, self.root)
         return self.root
 
+    def on_filter_text(self, _, value):
+        self.root.ids.filter_input.text = value
+
+    def on_log_full(self, _, value):
+        self._do_update_log = True
+
     def update_rv_data(self, _, value):
-        self.root.ids.rv.data = value
+        self.root.ids.rv.set_data(value)
 
     def set_filter_text(self, value):
+        self.root.ids.tab_holder.set_current_text(value)
         self.filter_text = value
         self.refilter_logs()
         self.log_filtered_len = len(self.log_filtered)
@@ -53,16 +84,18 @@ class LogFruitApp(App):
             filter_len = len(self.filter_text)
             new_logs = []
             for x in self.log_full:
-                b = x['text0'].find(self.filter_text)
+                b = x['text0'].lower().find(self.filter_text.lower())
                 if b != -1:
                     c = b + filter_len
                     start = escape_markup(x['text0'][:b])
                     end = escape_markup(x['text0'][c:])
-                    mid = x['text0'][b:c].replace(
-                        self.filter_text,
-                        '[color=%s]%s[/color]' % (
-                            self.highlight_color,
-                            escape_markup(self.filter_text)))
+                    # mid = x['text0'][b:c].replace(
+                    #     self.filter_text,
+                    #     '[color=%s]%s[/color]' % (
+                    #         self.highlight_color,
+                    #         escape_markup(self.filter_text)))
+                    mid = '[color=%s]%s[/color]' % (
+                        self.highlight_color, escape_markup(x['text0'][b:c]))
                     text = ''.join((start, mid, end))
                     new_logs.append(
                         {'time': x['time'], 'text': text, 'text0': x['text0']})
@@ -71,7 +104,9 @@ class LogFruitApp(App):
     def read_logs(self, *args):
         new_log = self.worker.read_queue()
 
-        if new_log:
+        if new_log or self._do_update_log:
+            if self._do_update_log:
+                self._do_update_log = False
 
             self.log_full = list(self.log_full) + new_log
 
@@ -82,6 +117,9 @@ class LogFruitApp(App):
         self.log_full_len2 = '%s/%s' % (
             len(self.worker.queue), self.worker.added_msg)
         self.log_filtered_len = len(self.log_filtered)
+
+    def globhandler_instruction(self, instr):
+        globhandler.do_stringinstruction(instr)
 
     def clear_logs(self):
         self.log_full = []
@@ -101,6 +139,9 @@ class LogFruitApp(App):
         self.fps_log.append(new_time)
         self.fps = int(1.0 / (alltime / len(self.fps_log)))
 
+    def on_start(self):
+        globhandler.init()
+
     def on_stop(self):
         self.stop_worker()
 
@@ -109,4 +150,9 @@ class LogFruitApp(App):
 
 if __name__ == '__main__':
     app = LogFruitApp()
-    app.run()
+    try:
+        app.run()
+    except:
+        Logger.error('App: %s' % (traceback.format_exc()))
+        if hasattr(worker, 'proc'):
+            worker.stop()
